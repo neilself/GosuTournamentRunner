@@ -1,5 +1,6 @@
 package org.nself.gtrunner
 
+import com.sun.tools.javac.Main
 import com.xenomachina.argparser.ArgParser
 import com.xenomachina.argparser.InvalidArgumentException
 import com.xenomachina.argparser.default
@@ -17,6 +18,7 @@ class RunnerArgs(parser: ArgParser) {
     )
 
     val source by parser.storing("--source", help = "The source file for team and player data").default("example_teams_8.csv")
+    val dest by parser.storing("--dest", help = "The destination file for tournament output").default("gtrunner_output.csv")
     val strategy by parser.storing("--strategy", help = "The desired seeding strategy to be used").default("match_disparate")
 
     fun getStrategy(strategyStr: String) : SeedingStrategy {
@@ -44,6 +46,10 @@ fun main(args: Array<String>) = mainBody {
             println()
             println(bracket.getRound(bracket.getLatestRoundId()).prettyString())
             println(bracket.currentRecordsString())
+
+            if (i == numberOfRounds - 1) {
+                MainUtils.outputResultsToCsvFile(bracket, dest)
+            }
         }
     }
 }
