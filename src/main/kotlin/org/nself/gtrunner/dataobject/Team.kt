@@ -1,10 +1,23 @@
 package org.nself.gtrunner.dataobject
 
 class Team(val teamId: Int, val name: String = "DefaultName", val initialRating: Float = 0f) {
-    var matchHistory: MutableList<Matchup> = mutableListOf()
+    val matchSchedule: MutableList<Matchup> = mutableListOf()
+    val matchHistory: MutableList<Matchup> = mutableListOf()
 
     fun addResult(result: Matchup) {
+        // Remove completed matchup from match schedule
+        for (matchup in matchSchedule) {
+            if (matchup.roundId == result.roundId
+                && matchup.team1.teamId == result.team1.teamId
+                && matchup.team2.teamId == result.team2.teamId) {
+                matchSchedule.remove(matchup)
+            }
+        }
         matchHistory.add(result)
+    }
+
+    fun addScheduledMatch(matchup: Matchup) {
+        matchSchedule.add(matchup)
     }
 
     fun winCount(): Int {
@@ -27,7 +40,7 @@ class Team(val teamId: Int, val name: String = "DefaultName", val initialRating:
         return count
     }
 
-    fun matchCount(): Int {
+    fun finishedMatchCount(): Int {
         return matchHistory.size
     }
 

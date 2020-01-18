@@ -1,6 +1,6 @@
 package org.nself.gtrunner
 
-import org.nself.gtrunner.bracket.SwissBracket
+import org.nself.gtrunner.bracket.Bracket
 import org.nself.gtrunner.dataobject.Team
 import org.nself.gtrunner.strategy.phase.PhaseUtils
 import java.io.File
@@ -25,7 +25,7 @@ object MainUtils {
         return teamSet
     }
 
-    fun outputResultsToCsvFile(bracket: SwissBracket, filename: String) {
+    fun outputResultsToCsvFile(bracket: Bracket, filename: String) {
         File(filename).printWriter().use { out ->
             for (col in outputColumns) {
                 out.print("$col, ")

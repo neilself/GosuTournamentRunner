@@ -17,15 +17,15 @@ class RemoveOddTeamOutPhase : MatchupFormationPhase {
         // Find the maximum number of matches played
         var maxMatchCount = 0
         for (team in remainingTeamSet) {
-            if (team.matchCount() > maxMatchCount) {
-                maxMatchCount = team.matchCount()
+            if (team.finishedMatchCount() > maxMatchCount) {
+                maxMatchCount = team.finishedMatchCount()
             }
         }
 
         // Create a list of teams that share the max number of matches played
         val constrainedTeamList = mutableListOf<Team>()
         for (team in remainingTeamSet) {
-            if (team.matchCount() == maxMatchCount) {
+            if (team.finishedMatchCount() == maxMatchCount) {
                 constrainedTeamList.add(team)
             }
         }

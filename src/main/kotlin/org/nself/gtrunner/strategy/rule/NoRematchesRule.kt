@@ -9,7 +9,13 @@ class NoRematchesRule : MatchupFormationRule {
     override fun isMatchupValid(matchup: Matchup): Boolean {
         for (priorMatchup in matchup.team1.matchHistory) {
             if (priorMatchup.team1.teamId == matchup.team2.teamId
-                || priorMatchup.team2.teamId == matchup.team2.teamId) {
+                        || priorMatchup.team2.teamId == matchup.team2.teamId) {
+                return false
+            }
+        }
+        for (futureMatchup in matchup.team1.matchSchedule) {
+            if (futureMatchup.team1.teamId == matchup.team2.teamId
+                || futureMatchup.team2.teamId == matchup.team2.teamId) {
                 return false
             }
         }

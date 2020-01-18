@@ -17,18 +17,11 @@ class MatchDisparatelyRatedTeamsPhase : MatchupFormationPhase {
         matchupSet: MutableSet<Matchup>
     ) {
         // Group teams by record
-        val teamGroupMap = mutableMapOf<Pair<Int, Int>, MutableSet<Team>>()
-        for (team in remainingTeamSet) {
-            if (teamGroupMap.keys.contains(team.record())) {
-                teamGroupMap[team.record()]?.add(team)
-            } else {
-                teamGroupMap[team.record()] = mutableSetOf(team)
-            }
-        }
+        val teamGroupMap = PhaseUtils.createTeamGroupMapByRecord(remainingTeamSet)
 
         // Create ordered list of records
         val recordList = teamGroupMap.keys.toMutableList()
-        recordList.sortBy(this::recordSelector)
+        PhaseUtils.sortRecordList(recordList)
 
         // Create matches within record groups as much as possible
         val leftoverTeams = mutableListOf<Team>()
@@ -60,9 +53,4 @@ class MatchDisparatelyRatedTeamsPhase : MatchupFormationPhase {
             remainingTeamSet.addAll(leftoverTeams)
         }
     }
-
-    /**
-     * Used for comparing Pairs that represent win-loss records. First = win count, second = loss count.
-     */
-    private fun recordSelector(p: Pair<Int, Int>) = p.first - p.second
 }

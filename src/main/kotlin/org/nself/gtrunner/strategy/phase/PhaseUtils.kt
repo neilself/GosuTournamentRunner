@@ -35,6 +35,13 @@ object PhaseUtils {
             for (rule in ruleSet) {
                 if (!rule.isMatchupValid(matchup)) {
                     isValid = false
+                    if (roundId == 3) {
+                        if (isValid) {
+                            println("Matchup valid: " + matchup)
+                        } else {
+                            println("Matchup NOT valid: " + matchup)
+                        }
+                    }
                 }
             }
 
@@ -100,10 +107,16 @@ object PhaseUtils {
     private fun recordSelector(p: Pair<Int, Int>) = p.first - p.second
 
     private fun getInitialIndicesForFindingMatchups(size: Int, searchPattern: MatchingSearchPattern): IndexObject {
-        if (searchPattern == MatchingSearchPattern.BEGINNING_TO_END) {
-            return IndexObject(0, 1, LastChangedIndex.LAST_CHANGED_I)
-        } else {
-            return IndexObject(0, size - 1, LastChangedIndex.LAST_CHANGED_J)
+        return when (searchPattern) {
+            MatchingSearchPattern.BEGINNING_TO_END -> {
+                IndexObject(0, 1, LastChangedIndex.LAST_CHANGED_I)
+            }
+            MatchingSearchPattern.OUTSIDE_IN -> {
+                IndexObject(0, size - 1, LastChangedIndex.LAST_CHANGED_J)
+            }
+            MatchingSearchPattern.FULL_SEARCH -> {
+                IndexObject(0, 1, LastChangedIndex.LAST_CHANGED_I)
+            }
         }
     }
 
@@ -112,19 +125,35 @@ object PhaseUtils {
         indexObject: IndexObject,
         searchPattern: MatchingSearchPattern
     ) {
-        if (searchPattern == MatchingSearchPattern.BEGINNING_TO_END) {
-            if (indexObject.j == size - 1) {
-                indexObject.i++
-            } else {
-                indexObject.j++
+        when (searchPattern) {
+            MatchingSearchPattern.BEGINNING_TO_END -> {
+                if (indexObject.j == size - 1) {
+                    indexObject.i++
+                } else {
+                    indexObject.j++
+                }
             }
-        } else {
-            if (indexObject.lastChanged == LastChangedIndex.LAST_CHANGED_I) {
-                indexObject.j--
-                indexObject.lastChanged = LastChangedIndex.LAST_CHANGED_J
-            } else {
-                indexObject.i++
-                indexObject.lastChanged = LastChangedIndex.LAST_CHANGED_I
+            MatchingSearchPattern.OUTSIDE_IN -> {
+                if (indexObject.lastChanged == LastChangedIndex.LAST_CHANGED_I) {
+                    indexObject.j--
+                    indexObject.lastChanged = LastChangedIndex.LAST_CHANGED_J
+                } else {
+                    indexObject.i++
+                    indexObject.lastChanged = LastChangedIndex.LAST_CHANGED_I
+                }
+            }
+            MatchingSearchPattern.FULL_SEARCH -> {
+                if (indexObject.j == size - 1) {
+                    // Last index for j, start new outside loop
+                    indexObject.i++
+                    indexObject.j = indexObject.i + 1
+                    if (indexObject.j >= size) {
+                        // We're done
+                        indexObject.j = indexObject.i
+                    }
+                } else {
+                    indexObject.j++
+                }
             }
         }
     }
@@ -138,6 +167,8 @@ object PhaseUtils {
 
     enum class MatchingSearchPattern {
         BEGINNING_TO_END,
-        OUTSIDE_IN
+        OUTSIDE_IN,
+        FULL_SEARCH // N^2 double loop bubble/insertion/selection sort style of search, where you start at i = 0, j = 1,
+                    // increment j in the inner loop, and i in the outer loop.
     }
 }
